@@ -1,4 +1,4 @@
-from Example_Code import ProjectEuler, Rosalind
+from example_code import ProjectEuler, Rosalind
 
 class Master(ProjectEuler,Rosalind):
     """
