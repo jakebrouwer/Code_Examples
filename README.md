@@ -2,7 +2,7 @@
 Coding Examples to reflect generalized personal coding practices
 
 The following shows the proper import path and how to run examples:
->  from Code_Examples import Master
+>  from Example_Code import Master
 > 
 > master = Master()
 > 
