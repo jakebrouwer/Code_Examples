@@ -13,8 +13,9 @@ class ClassicalML:
     
     def __init__(self,data='breast_cancer'):
         self.scores = {}
+        self.best_pre_optimization_model = None
         self.best_model = None
-        self.best_parameters = None
+        self.best_score = None
         if isinstance(data,str):
             _data = getattr(datasets,'load_'+data)
             self._data = _data(as_frame=True,return_X_y=True)
@@ -49,35 +50,20 @@ class ClassicalML:
             model.fit(self._X_train,self._y_train)
             self.scores[name] = model.score(self._X_test,self._y_test)
         self.best_model = sorted(self.scores.items(), key= lambda x: x[1],reverse=True)[0]
-        return self.best_model
+        return self.best_pre_optimization_model
 
-    def optimize_best_model(self,n_trials:int = 100,categorical_suggestions:dict=None,float_suggestions:dict=None,int_suggestions:dict=None):
-        import optuna
-        from sklearn.metrics import accuracy_score
-        if not self.best_model:
-            raise AttributeError('A model has not been generated.\nRun find_best_model() to generate a model.\n\n')
-        model = self.models[self.best_model[0]]
-
-        def objective(trial):
-            opt_params={}
-
-            if categorical_suggestions:
-                for key in categorical_suggestions.keys():
-                    opt_params[key] = trial.suggest_categorical(key,categorical_suggestions[key])
-            if float_suggestions:
-                for key in float_suggestions.keys():
-                    opt_params[key] = trial.suggest_float(key,**float_suggestions[key])
-            if int_suggestions:
-                for key in int_suggestions.keys():
-                    opt_params[key] = trial.suggest_int(key,**int_suggestions[key])
-
-            if not opt_params == {}:
-                model.set_params(**opt_params)
-            pred = model.predict(self._X_test)
-            return accuracy_score(self._y_test,pred)
-
-        study = optuna.create_study(direction='maximize')
-        study.optimize(objective,n_trials=n_trials)
-        trial = study.best_trial
-        self.best_parameters = trial.params
+    def optimize_best_model(self,generations:int = 5,population_size=100,cv=None,scoring='accuracy'):
+        from tpot import TPOTClassifier
+        from sklearn.model_selection import RepeatedStratifiedKFold
+        if not cv:
+            cv = RepeatedStratifiedKFold(n_splits=10,n_repeats=3)
+        t_pot = TPOTClassifier(verbosity=2,generations=generations,population_size=population_size,cv=cv,scoring=scoring)
+        t_pot.fit(self._X_train,self._y_train)
+        #t_pot.export(path+'best_model.py')
+        self.best_model = t_pot.fitted_pipeline_
+    
+    def score_best_model(self):
+        self.best_model.fit(self._X_train,self._y_train)
+        self.best_score = self.best_model.score(self._X_test,self._y_test)
+        return(self.best_score)
 
