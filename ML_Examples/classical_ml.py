@@ -49,15 +49,17 @@ class ClassicalML:
         for name,model in self.models.items():
             model.fit(self._X_train,self._y_train)
             self.scores[name] = model.score(self._X_test,self._y_test)
-        self.best_model = sorted(self.scores.items(), key= lambda x: x[1],reverse=True)[0]
+        self.best_pre_optimization_model = sorted(self.scores.items(), key= lambda x: x[1],reverse=True)[0]
         return self.best_pre_optimization_model
 
     def optimize_best_model(self,generations:int = 5,population_size=100,cv=None,scoring='accuracy'):
         from tpot import TPOTClassifier
         from sklearn.model_selection import RepeatedStratifiedKFold
+        model = self.models[self.best_pre_optimization_model[0]]
+        tpot_config = {str(model.__class__).split('\'')[1]:{}}
         if not cv:
             cv = RepeatedStratifiedKFold(n_splits=10,n_repeats=3)
-        t_pot = TPOTClassifier(verbosity=2,generations=generations,population_size=population_size,cv=cv,scoring=scoring)
+        t_pot = TPOTClassifier(verbosity=2,generations=generations,population_size=population_size,cv=cv,scoring=scoring,config_dict=tpot_config)
         t_pot.fit(self._X_train,self._y_train)
         #t_pot.export(path+'best_model.py')
         self.best_model = t_pot.fitted_pipeline_
