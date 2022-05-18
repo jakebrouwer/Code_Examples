@@ -13,10 +13,10 @@ The following shows the proper import path and how to run examples from the Exam
 The following shows the proper import path and how to run examples from the ML_Examples directory:
 > from ML_Examples import ClassicalML,AutoEncoder
 
-> classic = ClassicalML(data='breast_cancer')
-> classic.find_best_model()
-> classic.optimize_best_model()
+> classic = ClassicalML(data='breast_cancer')\
+> classic.find_best_model()\
+> classic.optimize_best_model()\
 > classic.score_best_model()
 
-> ae = AutoEncoder(data='mushroom')
+> ae = AutoEncoder(data='mushroom')\
 > ae.build_autoencoder()
