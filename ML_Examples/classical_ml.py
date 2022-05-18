@@ -1,12 +1,11 @@
-import pandas as pd
 from sklearn import datasets
 from sklearn.naive_bayes import BernoulliNB,GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier,GradientBoostingClassifier
 from sklearn.dummy import DummyClassifier
-from sklearn.model_selection import train_test_split
+from .data_loader import DataLoader
 
-class ClassicalML:
+class ClassicalML(DataLoader):
     
     @staticmethod
     def _add_models_from_json():
@@ -39,16 +38,6 @@ class ClassicalML:
         self.best_pre_optimization_model = None
         self.best_model = None
         self.best_score = None
-        if isinstance(data,str):
-            _data = getattr(datasets,'load_'+data)
-            self._data = _data(as_frame=True,return_X_y=True)
-            self._X_train,self._X_test,self._y_train,self._y_test = train_test_split(self._data[0],self._data[1])
-        elif isinstance(data,pd.DataFrame):
-            target_col = data.columns[-1]
-            y = data.pop(target_col)
-            self._X_train,self._X_test,self.y_train,self._y_test = train_test_split(data,y)
-        else:
-            raise TypeError('{} could not be loaded. \n\nAvailable datasets are datasets from sklearn.datasets that have the return_X_y parameter'.format(data))
 
         self.models = {
             'BernoulliNB':BernoulliNB(),
