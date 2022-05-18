@@ -1,0 +1,8 @@
+{
+    "breast_cancer":{
+        "url":"https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
+    },
+    "mushroom":{
+        "url":"https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
+    }
+}
