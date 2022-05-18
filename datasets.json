@@ -1,8 +1,10 @@
 {
     "breast_cancer":{
-        "url":"https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
+        "url":"https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data",
+        "target_col":"diagnosis"
     },
-    "mushroom":{
-        "url":"https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
+    "mushroom":{ 
+        "url":"https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data",
+        "taget_col":"class"
     }
 }
