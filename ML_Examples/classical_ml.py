@@ -1,8 +1,5 @@
 import pandas as pd
-import numpy as np
 from sklearn import datasets
-from sklearn.linear_model import LogisticRegression,Perceptron
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import BernoulliNB,GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier,GradientBoostingClassifier
@@ -11,6 +8,32 @@ from sklearn.model_selection import train_test_split
 
 class ClassicalML:
     
+    @staticmethod
+    def _add_models_from_json():
+        from json import load
+        import importlib
+        from os.path import dirname,join
+        from platform import system
+        current_path = dirname(__file__) #this line will error in live interpreter such as ipython
+        print(current_path)
+        sys = system()
+        if "win" in sys.lower():
+            path = join(current_path,"..\\models.json")
+        else:
+            path = join(current_path,"../models.json")
+
+        with open(path,"rt") as file:
+            json_data = load(file)
+        models = {}
+        for model_name,model_info in json_data.items():
+            import_path = model_info['import_path']
+            default_args = model_info['default_args']
+            module = importlib.import_module(import_path)
+            model_class = getattr(module,model_name)
+            models[model_name] = model_class(**default_args)
+        return models
+            
+
     def __init__(self,data='breast_cancer'):
         self.scores = {}
         self.best_pre_optimization_model = None
@@ -28,9 +51,6 @@ class ClassicalML:
             raise TypeError('{} could not be loaded. \n\nAvailable datasets are datasets from sklearn.datasets that have the return_X_y parameter'.format(data))
 
         self.models = {
-            'LogisticRegression':LogisticRegression(),
-            'Perceptron':Perceptron(),
-            'KNeighborsClassifier':KNeighborsClassifier(),
             'BernoulliNB':BernoulliNB(),
             'GaussianNB':GaussianNB(),
             'DecisionTreeClassifier':DecisionTreeClassifier(),
@@ -39,10 +59,9 @@ class ClassicalML:
             'DummyClassifier':DummyClassifier()
         }
 
-    def add_model(self,model:'sklearn_like',name:'str'):
-        from sklearn.base import is_classifier
-        if is_classifier(model) and hasattr(model,'fit'):
-            self.models[name]=model()
+        new_models = self._add_models_from_json()
+
+        self.models = {**self.models, **new_models}
 
     def find_best_model(self):
         from sklearn.metrics import accuracy_score,f1_score,precision_score
@@ -69,3 +88,8 @@ class ClassicalML:
         self.best_score = self.best_model.score(self._X_test,self._y_test)
         return(self.best_score)
 
+if __name__ == "__main__":
+    ml = ClassicalML()
+    ml.find_best_model()
+    ml.optimize_best_model()
+    ml.score_best_model()
