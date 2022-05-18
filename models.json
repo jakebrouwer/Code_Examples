@@ -1,0 +1,10 @@
+{
+    "LogisticRegression":{
+        "default_args":{},
+        "import_path": "sklearn.linear_model"
+    },
+    "Perceptron":{
+        "default_args":{},
+        "import_path":"sklearn.linear_model"
+    }
+}
