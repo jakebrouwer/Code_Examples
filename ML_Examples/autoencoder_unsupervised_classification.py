@@ -15,7 +15,7 @@ Y = LabelEncoder().fit_transform(Y)
 
 
 
-
+#build ae
 input_layer = keras.layers.Input(shape=X.shape[1])
 encoded = keras.layers.Dense(3,activation='relu')(input_layer)
 decoded = keras.layers.Dense(X.shape[1],activation='relu')(encoded)
@@ -35,9 +35,11 @@ ae.fit(
 )
 
 encoder = keras.models.Model(input_layer, encoded)
-X_ae = encoder.predict(X)
+X_ae = encoder.predict(X) #this is now the new, reduced data
 
-X_Train, X_Test, Y_Train, Y_Test = train_test_split(X_ae, Y, 
+#plug new data into a classical model to evaluate how successful the dimensionality reduction was
+#high scores indicate not alot of data was lost and autoencoder was successful at determining classes
+X_Train, X_Test, Y_Train, Y_Test = train_test_split(X_ae, Y,
                                                     test_size = 0.30, 
                                                     random_state = 101)
 trainedforest = RandomForestClassifier(n_estimators=700).fit(X_Train,Y_Train)
